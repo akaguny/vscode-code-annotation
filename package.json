@@ -57,6 +57,15 @@
         }
       },
       {
+        "command": "code-annotation.copySummaryToClipboard",
+        "category": "Code Annotation",
+        "title": "Copy Summary to Clipboard",
+        "icon": {
+          "light": "resources/light/summary.svg",
+          "dark": "resources/dark/summary.svg"
+        }
+      },
+      {
         "command": "code-annotation.removeNote",
         "category": "Code Annotation",
         "title": "Remove note",
@@ -181,6 +190,11 @@
         },
         {
           "command": "code-annotation.summary",
+          "when": "view == codeAnnotationView",
+          "group": "navigation"
+        },
+        {
+          "command": "code-annotation.copySummaryToClipboard",
           "when": "view == codeAnnotationView",
           "group": "navigation"
         }
