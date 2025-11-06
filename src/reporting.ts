@@ -86,3 +86,59 @@ export const copySummaryToClipboard = async (): Promise<void> => {
     await vscode.env.clipboard.writeText(notesSummary);
     vscode.window.showInformationMessage('Notes summary copied to clipboard!');
 };
+
+const getLineReference = (note: Note): string => {
+    const fileName = getRelativePathForFileName(note.fileName);
+    const startLine = note.positionStart.line + 1;
+    const startCol = note.positionStart.character + 1;
+    const endLine = note.positionEnd.line + 1;
+    const endCol = note.positionEnd.character + 1;
+
+    if (startLine === endLine && startCol === endCol) {
+        return `${fileName}#L${startLine}:${startCol}`;
+    }
+    return `${fileName}#L${startLine}:${startCol}-L${endLine}:${endCol}`;
+};
+
+const getNoteInLLMFormat = (note: Note, index: number): string => {
+    let result = `${index}. ${note.text}`;
+
+    if (note.fileName.length > 0) {
+        result += ` (${getLineReference(note)})`;
+    }
+
+    result += '\n';
+    return result;
+};
+
+export const getNotesInLLMFormat = (): string => {
+    const notes = getNotes();
+
+    let result = '# Code Review\n\n';
+
+    const pendingNotes = notes.filter(n => n.status === 'pending');
+    const completedNotes = notes.filter(n => n.status === 'done');
+
+    if (pendingNotes.length > 0) {
+        result += '## Pending\n\n';
+        pendingNotes.forEach((note, index) => {
+            result += getNoteInLLMFormat(note, index + 1);
+        });
+        result += '\n';
+    }
+
+    if (completedNotes.length > 0) {
+        result += '## Completed\n\n';
+        completedNotes.forEach((note, index) => {
+            result += getNoteInLLMFormat(note, index + 1);
+        });
+    }
+
+    return result;
+};
+
+export const copyLLMReportToClipboard = async (): Promise<void> => {
+    const llmReport = getNotesInLLMFormat();
+    await vscode.env.clipboard.writeText(llmReport);
+    vscode.window.showInformationMessage('LLM report copied to clipboard!');
+};

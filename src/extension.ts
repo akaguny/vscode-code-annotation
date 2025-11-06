@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 
 import { addNote, addPlainNote } from './note-db';
-import { generateMarkdownReport, copySummaryToClipboard } from './reporting';
+import { generateMarkdownReport, copySummaryToClipboard, copyLLMReportToClipboard } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 import { updateDecorations } from './decoration/decoration';
@@ -35,6 +35,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.commands.registerCommand('code-annotation.copySummaryToClipboard', () => {
         copySummaryToClipboard();
+    });
+
+    vscode.commands.registerCommand('code-annotation.copyLLMReportToClipboard', () => {
+        copyLLMReportToClipboard();
     });
 
     vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {

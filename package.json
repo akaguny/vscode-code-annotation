@@ -66,6 +66,15 @@
         }
       },
       {
+        "command": "code-annotation.copyLLMReportToClipboard",
+        "category": "Code Annotation",
+        "title": "Copy LLM Report to Clipboard",
+        "icon": {
+          "light": "resources/light/summary.svg",
+          "dark": "resources/dark/summary.svg"
+        }
+      },
+      {
         "command": "code-annotation.removeNote",
         "category": "Code Annotation",
         "title": "Remove note",
@@ -195,6 +204,11 @@
         },
         {
           "command": "code-annotation.copySummaryToClipboard",
+          "when": "view == codeAnnotationView",
+          "group": "navigation"
+        },
+        {
+          "command": "code-annotation.copyLLMReportToClipboard",
           "when": "view == codeAnnotationView",
           "group": "navigation"
         }
