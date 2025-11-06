@@ -80,3 +80,9 @@ export const generateMarkdownReport = (): void => {
         });
     });
 };
+
+export const copySummaryToClipboard = async (): Promise<void> => {
+    const notesSummary = getNotesInMarkdown();
+    await vscode.env.clipboard.writeText(notesSummary);
+    vscode.window.showInformationMessage('Notes summary copied to clipboard!');
+};

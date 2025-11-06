@@ -15,6 +15,7 @@ The "Code Annotation" can be found in the Activity pane.
 - Track annotations on its own pane
 - Check/Uncheck items as you complete them
 - Generate a report in Markdown with a summary of the pending and completed items
+- Copy notes summary to clipboard for quick sharing
 
 # Feedback and feature requests
 
@@ -43,6 +44,32 @@ npm install
 npm run compile
 ```
 - And to run/test the extension, go the the Run pane and hit the green button on `Run Extension`. This will open a new VSCode window with the extension enabled.
+
+## Using mise for Development
+
+This project supports [mise](https://mise.jdx.dev/) for managing development tools and tasks. If you have mise installed:
+
+```bash
+# Install dependencies
+mise run install
+
+# Build the project
+mise run build
+
+# Run linter
+mise run lint
+
+# Run tests
+mise run test
+
+# Watch for changes during development
+mise run watch
+
+# Create VSIX package
+mise run package
+```
+
+The `mise.toml` configuration manages Node.js version and defines common development tasks.
 
 ## Creating a VSIX file for instalation
 

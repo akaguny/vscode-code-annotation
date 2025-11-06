@@ -1,0 +1,40 @@
+[env]
+_.path = ["{{config_root}}/node_modules/.bin"]
+NODE_ENV = "development"
+
+[tools]
+node = "lts"
+
+[tasks.install]
+description = "Install dependencies"
+run = "npm install"
+
+[tasks.build]
+description = "Compile TypeScript to JavaScript"
+run = "npm run compile"
+sources = ["src/**/*.ts", "tsconfig.json", "package.json"]
+outputs = ["out/**/*.js", "out/**/*.map"]
+
+[tasks.lint]
+description = "Run ESLint for code quality"
+run = "npm run lint"
+sources = ["src/**/*.ts", ".eslintrc.json"]
+
+[tasks.test]
+description = "Run project tests"
+run = "npm test"
+depends = ["build", "lint"]
+
+[tasks.watch]
+description = "Watch for file changes and rebuild"
+run = "npm run watch"
+
+[tasks.package]
+description = "Create VSIX package for installation"
+run = "vsce package"
+depends = ["build"]
+
+[tasks.dev]
+description = "Build and watch for changes during development"
+run = "npm run watch"
+alias = "d"
