@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:20-bookworm
+FROM node:24-bookworm
 
 WORKDIR /workspace
 
