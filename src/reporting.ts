@@ -9,7 +9,7 @@ const getCodeSnippetString = (note: Note): string => {
     const firstLineOffset = moreThanOneLine ? note.positionStart.character : 0;
     let codeSnippet = note.codeSnippet;
     if (moreThanOneLine && firstLineOffset) {
-        const offsetSpace = Array(firstLineOffset + 1).join(' ');
+        const offsetSpace = ' '.repeat(firstLineOffset);
         codeSnippet = offsetSpace + codeSnippet;
     }
     return codeSnippet;
@@ -33,29 +33,24 @@ export const getNoteInMarkdown = (note: Note): string => {
     return result;
 };
 
-export const getNotesInMarkdown = (): string => {
-    const notes = getNotes();
+export const getNotesInMarkdown = (notes: Note[] = getNotes()): string => {
+    const pendingNotes = notes.filter(note => note.status === 'pending');
+    const completedNotes = notes.filter(note => note.status !== 'pending');
 
     let result = '# Code Annotator - Summary\n';
     result += '\n---\n';
     result += '## Pending\n';
 
-    for (let i in notes) {
-        const note = notes[i];
-        if (note.status === 'pending') {
-            result += getNoteInMarkdown(note);
-        }
-    }
+    pendingNotes.forEach(note => {
+        result += getNoteInMarkdown(note);
+    });
 
     result += '\n---\n';
     result += '## Done\n';
 
-    for (let i in notes) {
-        const note = notes[i];
-        if (note.status !== 'pending') {
-            result += getNoteInMarkdown(note);
-        }
-    }
+    completedNotes.forEach(note => {
+        result += getNoteInMarkdown(note);
+    });
 
     return result;
 };
@@ -111,9 +106,7 @@ const getNoteInLLMFormat = (note: Note, index: number): string => {
     return result;
 };
 
-export const getNotesInLLMFormat = (): string => {
-    const notes = getNotes();
-
+export const getNotesInLLMFormat = (notes: Note[] = getNotes()): string => {
     let result = '# Code Review\n\n';
 
     const pendingNotes = notes.filter(n => n.status === 'pending');

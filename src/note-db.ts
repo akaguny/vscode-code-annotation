@@ -30,7 +30,7 @@ export interface NotesDb {
 export const getNotesDb = (): NotesDb => {
     const annotationFile = getAnnotationFilePath();
     const rawdata = fs.readFileSync(annotationFile, 'utf8');
-    let annotations = JSON.parse(rawdata);
+    const annotations: NotesDb = JSON.parse(rawdata);
     return annotations;
 };
 
@@ -42,30 +42,28 @@ export const getNextId = (): number => {
     return getNotesDb().nextId;
 };
 
-export const saveDb = (db: NotesDb) => {
-    const data = JSON.stringify(db);
+export const saveDb = (db: NotesDb): void => {
+    const data = JSON.stringify(db, null, 2);
     fs.writeFileSync(getAnnotationFilePath(), data);
-    vscode.commands.executeCommand('code-annotation.refreshEntry');
+    void vscode.commands.executeCommand('code-annotation.refreshEntry');
 };
 
-export const saveNotes = (notes: Note[]) => {
-    let db = getNotesDb();
+export const saveNotes = (notes: Note[]): void => {
+    const db = getNotesDb();
 
-    // Replace notes by the one passed
     db.notes = notes;
 
-    // Save Db in JSON file
     saveDb(db);
 };
 
-const createNote = (annotationText: string, fromSelection: boolean) => {
+const createNote = (annotationText: string, fromSelection: boolean): Note => {
     const nextId = getNextId();
 
     let codeSnippet = '';
     let fileName = '';
-    let selection = undefined;
-    let positionStart: Position = {line: 0, character: 0};
-    let positionEnd: Position = {line: 0, character: 0};
+    let selection: vscode.Selection | undefined;
+    let positionStart: Position = { line: 0, character: 0 };
+    let positionEnd: Position = { line: 0, character: 0 };
 
     const editor = vscode.window.activeTextEditor;
     if (fromSelection && editor) {
@@ -77,37 +75,37 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
             positionEnd = { line: selection.end.line, character: selection.end.character };
         }
     }
-    const note: Note = {
-        fileName: fileName,
+
+    return {
+        fileName,
         fileLine: selection ? selection.start.line : 0,
-        positionStart: positionStart,
-        positionEnd: positionEnd,
+        positionStart,
+        positionEnd,
         text: annotationText,
-        codeSnippet: codeSnippet,
+        codeSnippet,
         status: 'pending',
         id: nextId,
         createdAt: new Date(),
         resolvedAt: undefined
     };
-    return note;
 };
 
-const createNoteFromSelection = (annotationText: string) => {
+const createNoteFromSelection = (annotationText: string): Note => {
     return createNote(annotationText, true);
 };
 
-const createPlainNote = (annotationText: string) => {
+const createPlainNote = (annotationText: string): Note => {
     return createNote(annotationText, false);
 };
 
-const addNoteToDb = (note: Note) => {
-    let db = getNotesDb();
+const addNoteToDb = (note: Note): void => {
+    const db = getNotesDb();
 
     db.notes.push(note);
     db.nextId++;
 
     saveDb(db);
-    vscode.window.showInformationMessage('Annotation saved!');
+    void vscode.window.showInformationMessage('Annotation saved!');
 };
 
 const getTODOFromSelectedText = (): string | undefined => {
@@ -129,8 +127,9 @@ const getTODOFromSelectedText = (): string | undefined => {
                     return customMatch[2];
                 }
             }
-        } catch (e) {
-            vscode.window.showErrorMessage(`Error checking custom regex '${custom}': ${e.toString()}`);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Error checking custom regex '${custom}': ${message}`);
             continue;
         }
     }

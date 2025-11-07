@@ -1,15 +1,24 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
+import * as path from 'path';
 import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
 
-suite('Extension Test Suite', () => {
-    vscode.window.showInformationMessage('Start all tests.');
+import { getRelativePathForFileName, getTimeStampsString } from '../../utils';
 
-    test('Sample test', () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
+suite('Utility helpers', () => {
+    test('resolves workspace relative paths', () => {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        assert.ok(workspaceFolder, 'workspace folder should be available for tests');
+
+        const filePath = path.join(workspaceFolder.uri.fsPath, 'src', 'extension.ts');
+        const relativePath = getRelativePathForFileName(filePath);
+
+        assert.strictEqual(relativePath, path.join('src', 'extension.ts'));
+    });
+
+    test('formats timestamps consistently', () => {
+        const formatted = getTimeStampsString(new Date('2023-01-01T12:34:56.000Z'));
+
+        assert.ok(/2023/.test(formatted));
+        assert.ok(/12/.test(formatted));
     });
 });
