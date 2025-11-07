@@ -37,7 +37,7 @@ Download the [VSIX file](https://github.com/thamara/vscode-code-annotation/blob/
 # Development
 
 - For the development you'll need to use VSCode
-- Install Node.js 24 LTS and npm
+- Install Node.js
 - After forking/cloning the repository, run:
 ```
 npm install
