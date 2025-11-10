@@ -10,65 +10,59 @@ import { updateDecorations } from './decoration/decoration';
 export function activate(context: vscode.ExtensionContext) {
     console.log('Extension "code-annotation" is now active!');
 
-    initializeStorageLocation(context.globalStoragePath);
+    initializeStorageLocation(context.globalStorageUri.fsPath);
 
     const tree = new NotesTree();
     const treeActions = new TreeActions(tree);
 
-    vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
-    vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.checkAllNotes', treeActions.checkAllNotes.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.uncheckAllNotes', treeActions.uncheckAllNotes.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.removeAllNotes', treeActions.removeAllNotes.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.uncheckNote', treeActions.uncheckNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.editNote', treeActions.editNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.copyNote', treeActions.copyNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
-        treeActions.openNoteFromId(id);
-    });
+    const registerCommand = (command: string, callback: (...args: unknown[]) => unknown) => {
+        context.subscriptions.push(vscode.commands.registerCommand(command, callback));
+    };
 
-    vscode.commands.registerCommand('code-annotation.summary', () => {
-        generateMarkdownReport();
-    });
+    context.subscriptions.push(
+        vscode.window.registerTreeDataProvider('codeAnnotationView', tree)
+    );
 
-    vscode.commands.registerCommand('code-annotation.copySummaryToClipboard', () => {
-        copySummaryToClipboard();
-    });
+    registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
+    registerCommand('code-annotation.checkAllNotes', treeActions.checkAllNotes.bind(treeActions));
+    registerCommand('code-annotation.uncheckAllNotes', treeActions.uncheckAllNotes.bind(treeActions));
+    registerCommand('code-annotation.removeAllNotes', treeActions.removeAllNotes.bind(treeActions));
+    registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
+    registerCommand('code-annotation.uncheckNote', treeActions.uncheckNote.bind(treeActions));
+    registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
+    registerCommand('code-annotation.editNote', treeActions.editNote.bind(treeActions));
+    registerCommand('code-annotation.copyNote', treeActions.copyNote.bind(treeActions));
+    registerCommand('code-annotation.openNoteFromId', treeActions.openNoteFromId.bind(treeActions));
 
-    vscode.commands.registerCommand('code-annotation.copyLLMReportToClipboard', () => {
-        copyLLMReportToClipboard();
-    });
+    registerCommand('code-annotation.summary', () => generateMarkdownReport());
+    registerCommand('code-annotation.copySummaryToClipboard', () => copySummaryToClipboard());
+    registerCommand('code-annotation.copyLLMReportToClipboard', () => copyLLMReportToClipboard());
 
-    vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
+    registerCommand('code-annotation.clearAllNotes', async () => {
         const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
         const enableAction = 'I\'m sure';
         const cancelAction = 'Cancel';
         const userResponse = await vscode.window.showInformationMessage(message, enableAction, cancelAction);
-        const clearAllNotes = userResponse === enableAction ? true : false;
+        const clearAllNotes = userResponse === enableAction;
 
         if (clearAllNotes) {
             const annotationFile = getAnnotationFilePath();
-            fs.unlinkSync(annotationFile);
-            vscode.commands.executeCommand('code-annotation.refreshEntry');
+            if (fs.existsSync(annotationFile)) {
+                fs.unlinkSync(annotationFile);
+            }
+            await vscode.commands.executeCommand('code-annotation.refreshEntry');
             vscode.window.showInformationMessage('All notes cleared!');
         }
     });
 
-    vscode.commands.registerCommand('code-annotation.addPlainNote', async () => {
-        addPlainNote();
-    });
+    registerCommand('code-annotation.addPlainNote', () => addPlainNote());
+    registerCommand('code-annotation.addNote', () => addNote());
 
-    let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
-        addNote();
-    });
-
-    vscode.workspace.onDidChangeConfiguration(() => updateDecorations(context) );
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeConfiguration(() => updateDecorations(context))
+    );
 
     updateDecorations(context);
-
-    context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated

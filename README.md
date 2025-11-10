@@ -37,7 +37,7 @@ Download the [VSIX file](https://github.com/thamara/vscode-code-annotation/blob/
 # Development
 
 - For the development you'll need to use VSCode
-- Install Node/Npm
+- Install Node.js
 - After forking/cloning the repository, run:
 ```
 npm install
@@ -70,6 +70,23 @@ mise run package
 ```
 
 The `mise.toml` configuration manages Node.js version and defines common development tasks.
+
+## Docker-based development
+
+A Docker environment is available for working on the extension without installing Node.js locally. The container uses the latest Node.js LTS release and mirrors the CI configuration.
+
+```bash
+# Start a watch task with automatic dependency installation
+docker compose up
+
+# Run the automated test suite inside Docker
+docker compose run --rm dev npm test
+
+# Run a one-off compile or lint step
+docker compose run --rm dev npm run compile
+```
+
+Use `Ctrl+C` to stop the watch task when you are done. The `dev` service mounts your working directory, so any changes made on the host are instantly available inside the container.
 
 ## Creating a VSIX file for instalation
 

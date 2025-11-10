@@ -1,0 +1,7 @@
+node_modules
+out
+.vscode-test
+.git
+.gitignore
+Dockerfile
+code-annotation.vsix

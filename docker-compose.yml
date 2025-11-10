@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  dev:
+    build:
+      context: .
+    working_dir: /workspace
+    command: sh -c "npm ci && npm run watch"
+    volumes:
+      - .:/workspace
+      - node_modules:/workspace/node_modules
+    environment:
+      - NODE_ENV=development
+    tty: true
+
+volumes:
+  node_modules:
